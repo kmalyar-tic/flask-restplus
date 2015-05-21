@@ -172,10 +172,10 @@ class Swagger(object):
             for resource, urls, kwargs in ns.resources:
                 for url in urls:
                     paths[extract_path(url)] = self.serialize_resource(ns, resource, url)
-
         specs = {
             'swagger': '2.0',
             'basePath': basepath,
+            'host': self.api.host or None,
             'paths': not_none_sorted(paths),
             'info': infos,
             'produces': list(self.api.representations.keys()),
@@ -244,6 +244,7 @@ class Swagger(object):
                 continue
             operations[method] = self.serialize_operation(doc, method)
             operations[method]['tags'] = [ns.name]
+            operations[method]['tags'].extend(doc[method].get('tags', []))
         return operations
 
     def serialize_operation(self, doc, method):
@@ -261,7 +262,18 @@ class Swagger(object):
                 operation['consumes'] = ['multipart/form-data']
             else:
                 operation['consumes'] = ['application/x-www-form-urlencoded', 'multipart/form-data']
+        operation.update(self.vendor_fields(doc, method))
         return not_none(operation)
+
+    def vendor_fields(self, doc, method):
+        '''Extract custom 3rd party Vendor fields prefixed with X-
+           https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification-extensions
+        '''
+        exts = {}
+        for key, value in doc[method].iteritems():
+            if key.startswith('X_'):
+                exts.update({key.replace('X_', 'X-'): value})
+        return exts
 
     def summary_for(self, doc, method):
         '''Extract the first sentence from the first docstring line'''

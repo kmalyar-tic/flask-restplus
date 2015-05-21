@@ -91,7 +91,7 @@ class Api(restful.Api):
     '''
 
     def __init__(self, app=None, version='1.0', title=None, description=None,
-            terms_url=None, license=None, license_url=None,
+            terms_url=None, license=None, license_url=None, host=None,
             contact=None, contact_url=None, contact_email=None,
             authorizations=None, security=None, ui=True, default_id=default_id,
             default='default', default_label='Default namespace', **kwargs):
@@ -104,6 +104,7 @@ class Api(restful.Api):
         self.contact_url = contact_url
         self.license = license
         self.license_url = license_url
+        self.host = host
         self.authorizations = authorizations
         self.security = security
         self.ui = ui
@@ -124,6 +125,7 @@ class Api(restful.Api):
         self.description = kwargs.get('description', self.description)
         self.terms_url = kwargs.get('terms_url', self.terms_url)
         self.contact = kwargs.get('contact', self.contact)
+        self.host = kwargs.get('host', self.host)
         self.contact_url = kwargs.get('contact_url', self.contact_url)
         self.contact_email = kwargs.get('contact_email', self.contact_email)
         self.license = kwargs.get('license', self.license)
