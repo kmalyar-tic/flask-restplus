@@ -108,8 +108,7 @@ def parser_to_params(parser):
         if arg.default:
             param['default'] = arg.default
         if arg.action == 'append':
-            param['items'] = {'type': param['type']}
-            param['type'] = 'array'
+            param['allowMultiple'] = True
         if arg.choices:
             param['enum'] = arg.choices
         # if param['in'] == 'body':
@@ -162,6 +161,8 @@ class Swagger(object):
             if self.api.license_url:
                 infos['license']['url'] = self.api.license_url
 
+
+
         paths = {}
         tags = []
         for ns in self.api.namespaces:
@@ -172,10 +173,11 @@ class Swagger(object):
             for resource, urls, kwargs in ns.resources:
                 for url in urls:
                     paths[extract_path(url)] = self.serialize_resource(ns, resource, url)
+
         specs = {
             'swagger': '2.0',
             'basePath': basepath,
-            'host': self.api.host or None,
+            'host': self.api.host,
             'paths': not_none_sorted(paths),
             'info': infos,
             'produces': list(self.api.representations.keys()),
@@ -266,13 +268,13 @@ class Swagger(object):
         return not_none(operation)
 
     def vendor_fields(self, doc, method):
-        '''Extract custom 3rd party Vendor fields prefixed with X-
+        '''Extract custom 3rd party Vendor fields prefixed with x-
            https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#specification-extensions
         '''
         exts = {}
         for key, value in doc[method].iteritems():
-            if key.startswith('X_'):
-                exts.update({key.replace('X_', 'X-'): value})
+            if key.startswith('x_'):
+                exts.update({key.replace('x_', 'x-'): value})
         return exts
 
     def summary_for(self, doc, method):
@@ -285,6 +287,7 @@ class Swagger(object):
     def description_for(self, doc, method):
         '''Extract the description metadata and fallback on the whole docstring'''
         parts = []
+
         if 'description' in doc:
             parts.append(doc['description'])
         if method in doc and 'description' in doc[method]:

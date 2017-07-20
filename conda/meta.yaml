@@ -1,0 +1,23 @@
+package:
+  name: flask-restplus
+  version: "0.7.2"
+
+source:
+  path: ..
+
+requirements:
+  build:
+    - python 2.7.13
+    - setuptools
+    - aniso8601
+    - pytz
+    - jsonschema
+    - flask
+    - flask-restful
+
+  run:
+    - python 2.7.13
+
+about:
+  home: https://github.com/kmalyar-tic/flask-restplus
+  license: TUDOR_INTERNAL
